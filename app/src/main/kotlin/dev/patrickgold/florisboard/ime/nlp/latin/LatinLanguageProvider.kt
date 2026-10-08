@@ -25,6 +25,7 @@ import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.SuggestionProvider
 import dev.patrickgold.florisboard.ime.nlp.WordSuggestionCandidate
 import dev.patrickgold.florisboard.lib.devtools.flogDebug
+import dev.patrickgold.florisboard.lib.devtools.flogWarning
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
@@ -34,6 +35,7 @@ import kotlinx.serialization.json.Json
 import org.florisboard.lib.android.readText
 import org.florisboard.lib.kotlin.guardedByLock
 import org.k3lp.runtime.K3Content
+import java.io.File
 import java.util.TreeMap
 
 class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProvider {
@@ -48,6 +50,10 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // "git" before "give", but "th" still prefers "the".
         private const val DEV_WORD_FREQUENCY = 240
         private const val LEARNED_BOOST = 4
+        private const val MAX_LEARNED_ENTRIES = 5000
+        private const val USER_DATA_DIR = "nlp"
+        private const val LEARNED_FILE = "learned_words.json"
+        private const val BLOCKED_FILE = "blocked_words.json"
     }
 
     private val appContext by context.appContext()
@@ -61,6 +67,53 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     private val blocked = guardedByLock { mutableSetOf<String>() }
     private val wordDataSerializer = MapSerializer(String.serializer(), Int.serializer())
     private val devWordsSerializer = ListSerializer(String.serializer())
+    private val learnedSerializer = MapSerializer(String.serializer(), Int.serializer())
+    private val blockedSerializer = ListSerializer(String.serializer())
+
+    private fun userDataFile(name: String) = File(appContext.filesDir, "$USER_DATA_DIR/$name")
+
+    private fun <T> readUserData(name: String, read: (String) -> T): T? {
+        return try {
+            val file = userDataFile(name)
+            if (file.isFile) read(file.readText()) else null
+        } catch (e: Exception) {
+            flogWarning { "Failed to read $name: $e" }
+            null
+        }
+    }
+
+    // Writes to a temp file first so a crash mid-write cannot corrupt the existing data.
+    private fun writeUserData(name: String, content: String) {
+        try {
+            val file = userDataFile(name)
+            file.parentFile?.mkdirs()
+            val tmp = File(file.parentFile, "$name.tmp")
+            tmp.writeText(content)
+            if (!tmp.renameTo(file)) {
+                file.delete()
+                tmp.renameTo(file)
+            }
+        } catch (e: Exception) {
+            flogWarning { "Failed to write $name: $e" }
+        }
+    }
+
+    private suspend fun saveLearned() = withContext(Dispatchers.IO) {
+        val snapshot = learned.withLock { learned ->
+            if (learned.size > MAX_LEARNED_ENTRIES) {
+                val keep = learned.entries.sortedByDescending { it.value }.take(MAX_LEARNED_ENTRIES)
+                learned.clear()
+                keep.forEach { learned[it.key] = it.value }
+            }
+            learned.toMap()
+        }
+        writeUserData(LEARNED_FILE, Json.encodeToString(learnedSerializer, snapshot))
+    }
+
+    private suspend fun saveBlocked() = withContext(Dispatchers.IO) {
+        val snapshot = blocked.withLock { it.toList() }
+        writeUserData(BLOCKED_FILE, Json.encodeToString(blockedSerializer, snapshot))
+    }
 
     override val providerId = ProviderId
 
@@ -87,6 +140,12 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
 
         wordData.withLock { wordData ->
             if (wordData.isEmpty()) {
+                readUserData(LEARNED_FILE) { Json.decodeFromString(learnedSerializer, it) }?.let { saved ->
+                    learned.withLock { it.putAll(saved) }
+                }
+                readUserData(BLOCKED_FILE) { Json.decodeFromString(blockedSerializer, it) }?.let { saved ->
+                    blocked.withLock { it.addAll(saved) }
+                }
                 // Here we use readText() because the test dictionary is a json dictionary
                 val rawData = appContext.assets.readText("ime/dict/data.json")
                 val jsonData = Json.decodeFromString(wordDataSerializer, rawData)
@@ -177,6 +236,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         if (candidate.sourceProvider !== this) return
         val key = candidate.text.toString().lowercase()
         learned.withLock { it[key] = (it[key] ?: 0) + 1 }
+        saveLearned()
     }
 
     override suspend fun notifySuggestionReverted(subtype: Subtype, candidate: SuggestionCandidate) {
@@ -186,8 +246,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     override suspend fun removeSuggestion(subtype: Subtype, candidate: SuggestionCandidate): Boolean {
         flogDebug { candidate.toString() }
         if (candidate.sourceProvider !== this) return false
-        // Not persisted: blocked words reappear after the process restarts.
         blocked.withLock { it.add(candidate.text.toString().lowercase()) }
+        saveBlocked()
         return true
     }
 
