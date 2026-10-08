@@ -23,11 +23,11 @@ Android keyboard forked from FlorisBoard, tuned for coding and Linux use. Kotlin
 
 ## Dictionary notes
 - Dev words keep their original casing via `displayForms`; lookup keys are lowercase.
-- Words may contain `-`, `_`, `.`, `/`, `:`; composing-range detection in `LatinLanguageProvider.determineLocalComposing` must keep these together.
+- Words may contain `-` or `_`; `LatinLanguageProvider.determineLocalComposing` keeps these together (`apt-get`, `snake_case`). Words containing `.`, `/` or `:` (e.g. `/etc`, `std::string`) are still split by the word-break rules.
 - Learned words persist to `filesDir/nlp/learned_words.json`; blocked words to `blocked_words.json`.
 
 ## Roadmap (phases)
 1. CLAUDE.md — done
-2. Persist learned/blocked words
-3. Handle `-`/`_` words
+2. Persist learned/blocked words — done
+3. Handle `-`/`_` words — done
 4. Settings toggle for dev dictionary

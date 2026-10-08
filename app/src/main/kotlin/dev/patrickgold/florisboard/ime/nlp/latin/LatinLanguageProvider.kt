@@ -19,6 +19,7 @@ package dev.patrickgold.florisboard.ime.nlp.latin
 import android.content.Context
 import dev.patrickgold.florisboard.appContext
 import dev.patrickgold.florisboard.ime.core.Subtype
+import dev.patrickgold.florisboard.ime.nlp.BreakIteratorGroup
 import dev.patrickgold.florisboard.ime.nlp.SpellingProvider
 import dev.patrickgold.florisboard.ime.nlp.SpellingResult
 import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
@@ -35,6 +36,7 @@ import kotlinx.serialization.json.Json
 import org.florisboard.lib.android.readText
 import org.florisboard.lib.kotlin.guardedByLock
 import org.k3lp.runtime.K3Content
+import org.k3lp.runtime.K3TextRange
 import java.io.File
 import java.util.TreeMap
 
@@ -182,6 +184,33 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             // Use valid word for valid input
             else -> SpellingResult.validWord()
         }
+    }
+
+    /**
+     * Extends the default word-break based composing range so that identifiers joined by `-` or `_`
+     * (`apt-get`, `snake_case`, `--dry-run`) are treated as a single word instead of being split at the joiner.
+     */
+    override suspend fun determineLocalComposing(
+        subtype: Subtype,
+        textBeforeSelection: CharSequence,
+        breakIterators: BreakIteratorGroup,
+        localLastCommitPosition: Int,
+    ): K3TextRange {
+        val base = super.determineLocalComposing(subtype, textBeforeSelection, breakIterators, localLastCommitPosition)
+        val end = textBeforeSelection.length
+        val baseStart = if (base == K3TextRange.Zero) end else base.start
+        var start = baseStart
+        while (start > 0 && textBeforeSelection[start - 1].let { it.isLetterOrDigit() || it == '-' || it == '_' }) {
+            start--
+        }
+        // Leading dashes belong to command-line flags (`--verbose`), not to the word being completed.
+        while (start < end && textBeforeSelection[start] == '-') start++
+        val hasWordChar = (start until end).any { i ->
+            textBeforeSelection[i].let { it.isLetterOrDigit() || it == '_' }
+        }
+        // Only deviate from the default when the word actually extends further back (or the trailing joiner
+        // was ignored), so regular prose behaves exactly as before.
+        return if (hasWordChar && start < end && start != baseStart) K3TextRange(start, end) else base
     }
 
     override suspend fun suggest(
