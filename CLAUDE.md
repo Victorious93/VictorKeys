@@ -11,6 +11,7 @@ Android keyboard forked from FlorisBoard, tuned for coding and Linux use. Kotlin
 - `app/src/main/assets/ime/dict/data.json` — English word -> frequency (max 255).
 - `app/src/main/assets/ime/dict/dev.json` — coding/Linux word list (JSON array of strings).
 - `app/src/main/res/values/strings.xml` — English strings; other locales come from Crowdin, do not edit them.
+- App name is `app_name` in `values/strings.xml` ("VictorKeys"; Beta/Debug variants in `src/beta` and `src/debug`). Launcher icon: `res/drawable-nodpi/ic_app_icon_foreground.png` and `_monochrome.png` over the `ic_app_icon_background` color (#0D0D0D). The application ID and Kotlin package are intentionally unchanged.
 
 ## Conventions
 - Follow `.editorconfig` (4 spaces, 120 cols, LF; 2 spaces for JSON/YAML).
