@@ -30,4 +30,4 @@ Android keyboard forked from FlorisBoard, tuned for coding and Linux use. Kotlin
 1. CLAUDE.md — done
 2. Persist learned/blocked words — done
 3. Handle `-`/`_` words — done
-4. Settings toggle for dev dictionary
+4. Settings toggle for dev dictionary (`prefs.suggestion.devDictionaryEnabled`) — done

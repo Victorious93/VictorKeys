@@ -17,6 +17,7 @@
 package dev.patrickgold.florisboard.ime.nlp.latin
 
 import android.content.Context
+import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.appContext
 import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.nlp.BreakIteratorGroup
@@ -59,12 +60,17 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     }
 
     private val appContext by context.appContext()
+    private val prefs by FlorisPreferenceStore
 
     // Sorted by lowercase word, which allows cheap prefix lookups via subMap().
     private val wordData = guardedByLock { TreeMap<String, Int>() }
     // Preferred display form for words that are not plain lowercase (e.g. "Python", "NixOS", "std::string").
     private val displayForms = guardedByLock { mutableMapOf<String, String>() }
-    // Session-local usage counts, used to favor words the user actually picks.
+    // Lowercase keys that come from dev.json, and the original frequency of those that also exist in data.json.
+    // Needed so that disabling the dev dictionary restores the plain English behavior.
+    private val devKeys = guardedByLock { mutableSetOf<String>() }
+    private val baseFrequencies = guardedByLock { mutableMapOf<String, Int>() }
+    // Learned usage counts, used to favor words the user actually picks.
     private val learned = guardedByLock { mutableMapOf<String, Int>() }
     private val blocked = guardedByLock { mutableSetOf<String>() }
     private val wordDataSerializer = MapSerializer(String.serializer(), Int.serializer())
@@ -158,6 +164,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                 displayForms.withLock { forms ->
                     for (word in devWords) {
                         val key = word.lowercase()
+                        devKeys.withLock { it.add(key) }
+                        wordData[key]?.let { orig -> baseFrequencies.withLock { it[key] = orig } }
                         wordData[key] = maxOf(wordData[key] ?: 0, DEV_WORD_FREQUENCY)
                         if (word != key) forms[key] = word
                     }
@@ -228,11 +236,18 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         val capitalize = typed.first().isUpperCase()
         val allCaps = typed.length > 1 && typed.all { !it.isLetter() || it.isUpperCase() }
 
+        val devEnabled = prefs.suggestion.devDictionaryEnabled.get()
+        val devSet = if (devEnabled) emptySet() else devKeys.withLock { it.toSet() }
+        val baseFreqs = if (devEnabled) emptyMap() else baseFrequencies.withLock { it.toMap() }
+
         val matches = wordData.withLock { words ->
             val learnedCounts = learned.withLock { it.toMap() }
             val blockedWords = blocked.withLock { it.toSet() }
             words.subMap(prefix, prefix + Character.MAX_VALUE).entries
                 .filter { it.key != prefix && it.key !in blockedWords }
+                // With the dev dictionary off, drop dev-only words and restore original frequencies of shared ones.
+                .filter { devEnabled || it.key !in devSet || it.key in baseFreqs }
+                .map { java.util.AbstractMap.SimpleEntry(it.key, baseFreqs[it.key] ?: it.value) }
                 .sortedWith(
                     compareByDescending<Map.Entry<String, Int>> {
                         it.value + (learnedCounts[it.key] ?: 0) * LEARNED_BOOST
@@ -243,7 +258,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         }
         if (matches.isEmpty()) return emptyList()
 
-        val forms = displayForms.withLock { it.toMap() }
+        val forms = if (devEnabled) displayForms.withLock { it.toMap() } else emptyMap()
         return matches.map { (key, freq) ->
             val display = forms[key] ?: key
             val text = when {

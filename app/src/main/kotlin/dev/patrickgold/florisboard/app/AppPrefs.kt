@@ -659,6 +659,10 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "suggestion__enabled",
             default = true,
         )
+        val devDictionaryEnabled = boolean(
+            key = "suggestion__dev_dictionary_enabled",
+            default = true,
+        )
         val displayMode = enum(
             key = "suggestion__display_mode",
             default = CandidatesDisplayMode.DYNAMIC_SCROLLABLE,

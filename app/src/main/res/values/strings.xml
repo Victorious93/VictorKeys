@@ -493,6 +493,8 @@
     <string name="pref__suggestion__title" comment="Preference group title">Suggestions</string>
     <string name="pref__suggestion__enabled__label" comment="Preference title">Display suggestions</string>
     <string name="pref__suggestion__enabled__summary" comment="Preference summary">Provides suggestions while you type</string>
+    <string name="pref__suggestion__dev_dictionary__label" comment="Preference title">Coding &amp; Linux dictionary</string>
+    <string name="pref__suggestion__dev_dictionary__summary" comment="Preference summary">Suggests common commands, distro names and programming terms</string>
     <string name="pref__suggestion__display_mode__label" comment="Preference title">Suggestions display mode</string>
     <string name="pref__suggestion__block_possibly_offensive__label" comment="Preference title">Block possibly offensive words</string>
     <string name="pref__suggestion__block_possibly_offensive__summary" comment="Preference summary">Prevents possibly offensive words from being suggested while you type</string>
