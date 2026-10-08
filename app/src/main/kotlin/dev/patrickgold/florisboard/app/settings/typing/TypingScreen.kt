@@ -81,7 +81,7 @@ fun TypingScreen() = FlorisScreen {
         FlorisErrorCard(
             modifier = Modifier.padding(8.dp).padding(top = 32.dp),
             text = """
-                Suggestions (except system autofill) and spell checking are not available in this release.
+                Spell checking is not available in this release, and suggestions are an early implementation (word completion only).
             """.trimIndent().replace('\n', ' '),
         )
 
@@ -90,6 +90,12 @@ fun TypingScreen() = FlorisScreen {
                 prefs.suggestion.enabled,
                 title = stringRes(R.string.pref__suggestion__enabled__label),
                 summary = stringRes(R.string.pref__suggestion__enabled__summary),
+            )
+            SwitchPreference(
+                prefs.suggestion.devDictionaryEnabled,
+                title = stringRes(R.string.pref__suggestion__dev_dictionary__label),
+                summary = stringRes(R.string.pref__suggestion__dev_dictionary__summary),
+                enabledIf = { prefs.suggestion.enabled isEqualTo true },
             )
             SwitchPreference(
                 prefs.suggestion.blockPossiblyOffensive,
