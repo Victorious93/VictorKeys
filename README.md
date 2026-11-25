@@ -1,158 +1,78 @@
-<img align="left" width="80" height="80"
-src=".github/repo_icon.png" alt="App icon">
+<div align="center">
 
-# FlorisBoard [![Crowdin](https://badges.crowdin.net/florisboard/localized.svg)](https://crowdin.florisboard.org) [![Matrix badge](https://img.shields.io/badge/chat-%23florisboard%3amatrix.org-blue)](https://matrix.to/#/#florisboard:matrix.org) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md) [![FlorisBoard CI](https://github.com/florisboard/florisboard/actions/workflows/android.yml/badge.svg?event=push)](https://github.com/florisboard/florisboard/actions/workflows/android.yml)
+<img src=".github/repo_icon.png" alt="VictorKeys logo" width="128">
 
-**FlorisBoard** is a free and open-source keyboard for Android 8.0+
-devices. It aims at being modern, user-friendly and customizable while
-fully respecting your privacy. Currently in beta state.
+# VictorKeys
 
-<table>
-<tr>
-<th style="text-align: center; width: 50%">
-<h3>Stable <a href="https://github.com/florisboard/florisboard/releases/latest"><img alt="Latest stable release" src="https://img.shields.io/github/v/release/florisboard/florisboard?sort=semver&display_name=tag&color=28a745"></a></h3>
-</th>
-<th style="text-align: center; width: 50%">
-<h3>Preview <a href="https://github.com/florisboard/florisboard/releases"><img alt="Latest preview release" src="https://img.shields.io/github/v/release/florisboard/florisboard?include_prereleases&sort=semver&display_name=tag&color=fd7e14"></a></h3>
-</th>
-</tr>
-<tr>
-<td style="vertical-align: top">
-<p><i>Major versions only</i><br><br>Updates are more polished, new features are matured and tested through to ensure a stable experience.</p>
-</td>
-<td style="vertical-align: top">
-<p><i>Major + Alpha/Beta/Rc versions</i><br><br>Updates contain new features that may not be fully matured yet and bugs are more likely to occur. Allows you to give early feedback.</p>
-</td>
-</tr>
-<tr>
-<td style="vertical-align: top">
+**An Android keyboard forked from FlorisBoard, with coding and Linux word suggestions.**
+
+Works on its own; fleet integration is optional
+
 <p>
-<a href="https://apt.izzysoft.de/fdroid/index/apk/dev.patrickgold.florisboard"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="64" alt="IzzySoft repo badge"></a>
-<a href="https://f-droid.org/packages/dev.patrickgold.florisboard"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="64" alt="F-Droid badge"></a>
+  <img src="https://img.shields.io/badge/Release-no_release_yet-FF2BD6?style=flat-square&labelColor=0B0F1A" alt="No release yet" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-FF2BD6?style=flat-square&labelColor=0B0F1A" alt="License: Apache 2.0" /></a>
+  <a href="https://github.com/Victorious93/VictorKeys/actions/workflows/android.yml"><img src="https://img.shields.io/github/actions/workflow/status/Victorious93/VictorKeys/android.yml?style=flat-square&label=CI&labelColor=0B0F1A&color=00E5FF" alt="CI" /></a>
+  <img src="https://img.shields.io/badge/Android-8.0%2B_(API_26)-00E5FF?style=flat-square&labelColor=0B0F1A" alt="Android 8.0+" />
+  <a href="https://github.com/florisboard/florisboard"><img src="https://img.shields.io/badge/based_on-FlorisBoard-00E5FF?style=flat-square&labelColor=0B0F1A" alt="Based on FlorisBoard" /></a>
+  <a href="https://victorious-framework.pages.dev"><img src="https://img.shields.io/badge/Fleet-Victorious_Framework-FF2BD6?style=flat-square&labelColor=0B0F1A" alt="Victorious Framework fleet" /></a>
 </p>
-<p>
 
-**Google Play**: Join the [FlorisBoard Test Group](https://groups.google.com/g/florisboard-closed-beta-test), then visit the [testing page](https://play.google.com/apps/testing/dev.patrickgold.florisboard). Once joined and installed, updates will be delivered like for any other app. ([Store entry](https://play.google.com/store/apps/details?id=dev.patrickgold.florisboard))
+</div>
 
-</p>
-<p>
+**Package id:** `dev.patrickgold.florisboard` (display name is VictorKeys). VictorKeys and upstream FlorisBoard cannot be installed on the same device.
 
-**Obtainium**: [Auto-import stable config][obtainium_stable]
+> **Credits:** VictorKeys is a modified version of [FlorisBoard](https://github.com/florisboard/florisboard) by [patrickgold](https://github.com/patrickgold) and [the FlorisBoard contributors](https://github.com/florisboard/florisboard/graphs/contributors) (Apache-2.0). This project is not affiliated with or endorsed by the upstream authors.
 
-</p>
-<p>
+## Features
 
-**Manual**: Download and install the APK from the release page.
+Fork-specific additions in this repository:
 
-</p>
-</td>
-<td style="vertical-align: top">
-<p><a href="https://apt.izzysoft.de/fdroid/index/apk/dev.patrickgold.florisboard.beta"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="64" alt="IzzySoft repo badge"></a></p>
-<p>
+- **Coding & Linux dictionary** — a built-in word list (`app/src/main/assets/ime/dict/dev.json`) with a Settings toggle labelled **Coding & Linux dictionary**
+- **Identifier-aware composing** — hyphen- or underscore-joined identifiers are treated as a single composing word
+- **Persistent suggestions** — learned and blocked suggestion words are saved to disk
 
-**Google Play**: Join the [FlorisBoard Test Group](https://groups.google.com/g/florisboard-closed-beta-test), then visit the [preview testing page](https://play.google.com/apps/testing/dev.patrickgold.florisboard.beta). Once joined and installed, updates will be delivered like for any other app. ([Store entry](https://play.google.com/store/apps/details?id=dev.patrickgold.florisboard.beta))
+The rest of the keyboard is FlorisBoard (currently versioned `0.6.0-alpha02` in `gradle.properties`): themes, clipboard history, emoji keyboard, and extension support as implemented upstream. This README does not repeat upstream's feature list or claim device-test results.
 
-</p>
-<p>
+## Screenshots
 
-**Obtainium**: [Auto-import preview config][obtainium_preview]
+No screenshots of VictorKeys are in this repository yet.
 
-</p>
-<p>
+## Install / download
 
-**Manual**: Download and install the APK from the release page.
+No GitHub Release and no published APK yet. Do not install FlorisBoard from F-Droid or Google Play and expect it to be this fork.
 
-</p>
-</td>
-</tr>
-</table>
+Debug / pre-release builds can be assembled from source (below). These are not finished software. Install only if you understand the risk.
 
-Beginning with v0.7 FlorisBoard will enter the public beta on Google Play.
+## Build from source
 
-## Highlighted features
-- Integrated clipboard manager / history
-- Advanced theming support and customization
-- Integrated extension support (still evolving)
-- Emoji keyboard / history / suggestions
+Requires the Android SDK (compile/target SDK 37, minSdk 26) and the Gradle wrapper in this repo.
 
-> [!IMPORTANT]
-> Word suggestions/spell checking are not included in the current releases
-> and are a major goal for the v0.6 milestone.
+```bash
+./gradlew clean && ./gradlew assembleDebug
+```
 
-Feature roadmap: See [ROADMAP.md](ROADMAP.md)
+See [CONTRIBUTING.md](CONTRIBUTING.md) for upstream build notes that still apply.
+
+## Permissions
+
+This fork inherits FlorisBoard's permission set. See the [upstream permissions page](https://docs.florisboard.org/permissions).
+
+## Victorious fleet
+
+VictorKeys is part of the [Victorious Framework](https://victorious-framework.pages.dev), a family of Android and PC tools by Don Victor. **It works standalone; fleet integrations are optional.** Related: [Victorious-Keyboard](https://github.com/Victorious93/Victorious-Keyboard), [VictorSuite](https://github.com/Victorious93/VictorSuite), [VictorLinux](https://github.com/Victorious93/VictorLinux). The roster is in [victorious-fleet](https://github.com/Victorious93/victorious-fleet) and live status is in [fleet-manifest](https://github.com/Victorious93/fleet-manifest).
 
 ## Contributing
-Want to contribute to FlorisBoard? That's great to hear! There are lots of
-different ways to help out, please see the [contribution guidelines](CONTRIBUTING.md) for more info.
 
-## Addons Store
-The official [Addons Store](https://beta.addons.florisboard.org) offers the possibility for the community to share and download FlorisBoard extensions.
-Instructions on how to publish addons can be found [here](https://docs.florisboard.org/publishing).
-
-Many thanks to Ali ([@4H1R](https://github.com/4H1R)) for implementing the store!
-
-> [!NOTE]
-> During the initial beta release phase, the Addons Store _will_ only accept theme extensions.
-> Later on we plan to add support for language packs and keyboard extensions.
-
-## List of permissions FlorisBoard requests
-Please refer to this [page](https://docs.florisboard.org/permissions)
-to get more information on this topic.
-
-## APK signing certificate hashes
-
-The package names and SHA-256 hashes of the signature certificate are listed below, so you can verify both FlorisBoard variants with apksigner by using `apksigner verify --print-certs florisboard-<version>-<track>.apk` when you download the APK.
-If you have [AppVerifier](https://github.com/soupslurpr/AppVerifier) installed, you can alternatively copy both the package name and the hash of the corresponding track and share them to AppVerifier.
-
-##### Stable track:
-
-dev.patrickgold.florisboard<br>
-0B:80:71:64:50:8E:AF:EB:1F:BB:81:5B:E7:A2:3C:77:FE:68:9D:94:B1:43:75:C9:9B:DA:A9:B6:57:7F:D6:D6
-
-##### Preview track:
-
-dev.patrickgold.florisboard.beta<br>
-0B:80:71:64:50:8E:AF:EB:1F:BB:81:5B:E7:A2:3C:77:FE:68:9D:94:B1:43:75:C9:9B:DA:A9:B6:57:7F:D6:D6
-
-
-## Used libraries, components and icons
-* [AndroidX libraries](https://github.com/androidx/androidx) by
-  [Android Jetpack](https://github.com/androidx)
-* [AboutLibraries](https://github.com/mikepenz/AboutLibraries) by
-  [mikepenz](https://github.com/mikepenz)
-* [Google Material icons](https://github.com/google/material-design-icons) by
-  [Google](https://github.com/google)
-* [JetPref preference library](https://github.com/patrickgold/jetpref) by
-  [patrickgold](https://github.com/patrickgold)
-* [KotlinX coroutines library](https://github.com/Kotlin/kotlinx.coroutines) by
-  [Kotlin](https://github.com/Kotlin)
-* [KotlinX serialization library](https://github.com/Kotlin/kotlinx.serialization) by
-  [Kotlin](https://github.com/Kotlin)
-
-Many thanks to [Nikolay Anzarov](https://www.behance.net/nikolayanzarov) ([@BloodRaven0](https://github.com/BloodRaven0)) for designing and providing the main app icons to this project!
+Issues and pull requests are welcome. Please describe what you changed and why, and keep documentation accurate to the code — do not invent features, builds, or test results. Upstream contribution guidelines are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
+
 ```
 Copyright 2020-2026 The FlorisBoard Contributors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 ```
 
-Thanks to [The FlorisBoard Contributors](https://github.com/florisboard/florisboard/graphs/contributors) for making this project possible!
+VictorKeys modifications in this fork follow the same license. Upstream trademarks and product names remain their owners'.
 
-<!-- BEGIN SECTION: obtainium_links -->
-<!-- auto-generated link templates, do NOT edit by hand -->
-<!-- see fastlane/update-readme.sh -->
-[obtainium_preview]: https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22dev.patrickgold.florisboard.beta%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fflorisboard%2Fflorisboard%22%2C%22author%22%3A%22florisboard%22%2C%22name%22%3A%22FlorisBoard%20Preview%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22preview%5C%22%7D%22%7D%0A
-[obtainium_stable]: https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22dev.patrickgold.florisboard%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fflorisboard%2Fflorisboard%22%2C%22author%22%3A%22florisboard%22%2C%22name%22%3A%22FlorisBoard%20Stable%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Atrue%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22stable%5C%22%7D%22%7D%0A
-<!-- END SECTION: obtainium_links -->
+Thanks to [The FlorisBoard Contributors](https://github.com/florisboard/florisboard/graphs/contributors) for making the upstream project possible. The original FlorisBoard app icon was designed by [Nikolay Anzarov](https://www.behance.net/nikolayanzarov) ([@BloodRaven0](https://github.com/BloodRaven0)); this fork uses a new launcher icon added in the VictorKeys rename commit.
